@@ -87,4 +87,13 @@ export async function getTweet(id: number) {
     });
 }
 
+export async function createTweet(userId: number, content: string) {
+    return await db.tweet.create({
+        data: {
+            tweet: content,
+            userId: userId,
+        },
+    });
+}
+
 export default db;

@@ -2,12 +2,9 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { getUserFromSession, handleLogout } from "./action";
 import Link from "next/link";
-import { getSession } from "@/lib/session";
 
 export default async function ProfilePage() {
     const user = await getUserFromSession()
-    const session = await getSession()
-    console.log(session.id)
 
     return (
         <div className="flex justify-center items-center h-screen">

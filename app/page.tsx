@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import AddTweet from "@/components/AddTweet";
 
 export default async function Home({
     searchParams,
@@ -15,19 +16,22 @@ export default async function Home({
         redirect("/login");
     }
 
-    const page = searchParams.page ? parseInt(searchParams.page) : 1;
-    const { tweets, totalPages, currentPage } = await getTweets(page);
+    const { page } = await searchParams;
+    const { tweets, totalPages, currentPage } = await getTweets(parseInt(page) || 1);
 
     return (
         <div className="flex justify-center p-6 min-h-screen">
             <Card className="w-full max-w-xl">
                 <CardContent className="pt-6">
                     <h1 className="text-2xl font-bold text-center mb-6">트윗 목록</h1>
-                    <div className="flex justify-end mb-4">
+                    <div className="flex justify-end mb-4 gap-2">
                         <Link href="/profile">
-                            <Button className="w-full rounded-full hover:cursor-pointer">프로필</Button>
+                            <Button className="rounded-full hover:cursor-pointer">프로필</Button>
                         </Link>
                     </div>
+
+                    <AddTweet />
+
                     <div className="w-full space-y-4">
                         {tweets.length === 0 ? (
                             <p className="text-center text-gray-500">트윗이 없습니다.</p>

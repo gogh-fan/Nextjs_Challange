@@ -19,7 +19,7 @@ export default async function TweetDetail({
 
     const tweetId = parseInt(params.id);
     const tweet = await getTweet(tweetId);
-    const page = searchParams.page || "1";
+    const { page } = await searchParams;
 
     if (!tweet) {
         return (
@@ -62,7 +62,7 @@ export default async function TweetDetail({
                 </CardContent>
                 <CardFooter className="justify-center">
                     <Button variant="outline" asChild>
-                        <Link href={`/?page=${page}`}>
+                        <Link href={`/?page=${page || 1}`}>
                             ← 목록으로 돌아가기
                         </Link>
                     </Button>
