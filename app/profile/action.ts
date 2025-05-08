@@ -1,6 +1,6 @@
 import { getUser } from "@/lib/db"
 import { getSession } from "@/lib/session"
-import { notFound, redirect } from "next/navigation"
+import { redirect } from "next/navigation"
 
 export async function getUserFromSession() {
     const session = await getSession()

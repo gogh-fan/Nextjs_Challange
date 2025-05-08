@@ -16,7 +16,7 @@ interface LikeBtnProps {
 export default function LikeBtn({ tweetId, userId, isLiked, likeCount }: LikeBtnProps) {
     const [state, reducerFn] = useOptimistic(
         { isLiked, likeCount },
-        (previousState, _) => ({
+        (previousState) => ({
             isLiked: !previousState.isLiked,
             likeCount: previousState.isLiked
                 ? previousState.likeCount - 1
