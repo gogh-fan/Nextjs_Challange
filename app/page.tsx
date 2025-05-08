@@ -51,7 +51,7 @@ export default async function Home({
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-sm text-gray-500">
-                                                        {tweet.Like.length} 좋아요
+                                                        {tweet.like.length} 좋아요
                                                     </span>
                                                 </div>
                                             </div>

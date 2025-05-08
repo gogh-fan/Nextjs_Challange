@@ -1,9 +1,22 @@
-import { getTweet } from "@/lib/db";
+import { getTweet, getResponses, getIsLiked, getUser } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import LikeBtn from "@/components/likeBtn";
+import { unstable_cache } from "next/cache";
+import ResponseSection from "@/components/ResponseSection";
+
+const getCachedTweet = unstable_cache(getTweet, ["tweet-detail"], {
+    tags: ["tweet-detail"],
+    revalidate: 60,
+});
+
+const getCachedResponses = unstable_cache(getResponses, ["tweet-responses"], {
+    tags: ["tweet-responses"],
+    revalidate: 60,
+});
 
 export default async function TweetDetail({
     params,
@@ -16,10 +29,17 @@ export default async function TweetDetail({
     if (!session.id) {
         redirect("/login");
     }
-
-    const tweetId = parseInt(params.id);
-    const tweet = await getTweet(tweetId);
+    const userId = session.id;
+    const user = await getUser(userId);
+    if (!user) return notFound();
+    const { id } = await params;
+    const tweetId = parseInt(id);
     const { page } = await searchParams;
+
+    const tweet = await getCachedTweet(tweetId);
+    const isLiked = await getIsLiked(tweetId);
+    const likeCount = tweet?.like.length || 0;
+    const responses = await getCachedResponses(tweetId);
 
     if (!tweet) {
         return (
@@ -56,17 +76,19 @@ export default async function TweetDetail({
                         </p>
                     </div>
                     <p className="text-lg mb-6">{tweet.tweet}</p>
-                    <div className="flex items-center text-sm text-gray-500">
-                        <span>{tweet.Like.length}명이 좋아합니다</span>
+                    <div className="flex justify-end gap-3 items-center text-sm text-gray-500">
+                        <LikeBtn tweetId={tweetId} userId={userId} isLiked={isLiked} likeCount={likeCount} />
                     </div>
+
+                    <div className="flex justify-center mt-6 mb-8">
+                        <Button variant="outline" asChild>
+                            <Link href={`/?page=${page || 1}`}>
+                                ← 목록으로 돌아가기
+                            </Link>
+                        </Button>
+                    </div>
+                    <ResponseSection responses={responses} tweetId={tweetId} user={user} />
                 </CardContent>
-                <CardFooter className="justify-center">
-                    <Button variant="outline" asChild>
-                        <Link href={`/?page=${page || 1}`}>
-                            ← 목록으로 돌아가기
-                        </Link>
-                    </Button>
-                </CardFooter>
             </Card>
         </div>
     );

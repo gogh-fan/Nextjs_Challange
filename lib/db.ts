@@ -1,4 +1,5 @@
 import { PrismaClient } from "./generated/prisma";
+import { getSession } from "./session";
 
 const db = new PrismaClient();
 
@@ -46,9 +47,10 @@ export async function getTweets(page: number = 1, pageSize: number = 2) {
                     username: true,
                 }
             },
-            Like: {
+            like: {
                 select: {
-                    id: true,
+                    userId: true,
+                    tweetId: true,
                 }
             }
         }
@@ -77,10 +79,10 @@ export async function getTweet(id: number) {
                     bio: true,
                 }
             },
-            Like: {
+            like: {
                 select: {
-                    id: true,
                     userId: true,
+                    tweetId: true,
                 }
             }
         }
@@ -92,6 +94,48 @@ export async function createTweet(userId: number, content: string) {
         data: {
             tweet: content,
             userId: userId,
+        },
+    });
+}
+
+export async function getIsLiked(tweetId: number) {
+    const session = await getSession();
+    const like = await db.like.findUnique({
+        where: {
+            id: {
+                tweetId,
+                userId: session.id!,
+            },
+        },
+    });
+    return Boolean(like);
+}
+
+export async function createResponse(userId: number, tweetId: number, content: string) {
+    return await db.response.create({
+        data: {
+            payload: content,
+            userId,
+            tweetId,
+        },
+    });
+}
+
+export async function getResponses(tweetId: number) {
+    return await db.response.findMany({
+        where: {
+            tweetId,
+        },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    username: true,
+                }
+            },
+        },
+        orderBy: {
+            created_at: 'desc'
         },
     });
 }

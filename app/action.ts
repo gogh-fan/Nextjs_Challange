@@ -1,9 +1,10 @@
 "use server";
 
 import { z } from "zod";
-import { createTweet } from "@/lib/db";
+import { createTweet, createResponse } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { revalidatePath } from "next/cache";
+import { responseSchema } from "./schem";
 
 const tweetSchema = z.object({
     content: z
@@ -37,4 +38,14 @@ export async function addTweet(prevState: any, formData: FormData) {
         console.error("트윗 작성 오류:", error);
         return { success: false, message: "오류가 발생했습니다. 다시 시도해주세요" };
     }
+}
+
+export async function addResponse(formData: FormData, userId: number, tweetId: number) {
+    const payload = formData.get("payload") as string;
+    const validation = responseSchema.safeParse({ payload, tweetId });
+
+    if (!validation.success) return validation.error.flatten()
+
+    await createResponse(userId, tweetId, payload);
+    revalidatePath(`/tweet/${tweetId}`);
 } 
