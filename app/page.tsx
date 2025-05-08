@@ -9,15 +9,15 @@ import AddTweet from "@/components/AddTweet";
 export default async function Home({
     searchParams,
 }: {
-    searchParams: { page: string };
+    searchParams: Promise<{ page?: string }>;
 }) {
     const session = await getSession();
     if (!session.id) {
         redirect("/login");
     }
 
-    const { page } = await searchParams;
-    const { tweets, totalPages, currentPage } = await getTweets(parseInt(page) || 1);
+    const { page = "1" } = await searchParams;
+    const { tweets, totalPages, currentPage } = await getTweets(parseInt(page));
 
     return (
         <div className="flex justify-center p-6 min-h-screen">

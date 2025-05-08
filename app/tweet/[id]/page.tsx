@@ -22,8 +22,8 @@ export default async function TweetDetail({
     params,
     searchParams,
 }: {
-    params: { id: string };
-    searchParams: { page?: string };
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ page: string }>;
 }) {
     const session = await getSession();
     if (!session.id) {
